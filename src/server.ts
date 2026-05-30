@@ -2,8 +2,10 @@ import { createServer } from "node:http";
 import { resolve } from "node:path";
 import { createRequestHandler } from "./app.js";
 import { loadConfig } from "./config.js";
+import { loadEnvironmentFile } from "./environment.js";
 import { DataService } from "./services/data-service.js";
 
+loadEnvironmentFile();
 const config = loadConfig(process.env);
 const dataService = new DataService(config);
 dataService.start();

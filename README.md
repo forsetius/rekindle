@@ -24,7 +24,9 @@ icons from their SVG sources.
 
 ## Configuration
 
-Copy `.env.example` values into your process environment:
+Copy `.env.example` to `.env` and adjust its values. ReKindle reads this file
+automatically when it exists. Variables already defined in the process environment
+take precedence, so deployments can also provide configuration without a file.
 
 | Variable | Required | Description |
 | --- | --- | --- |
@@ -47,9 +49,6 @@ MeteoAlarm EDR for the configured country and downloads linked CAP documents.
 ```sh
 npm install --include=dev
 npm run build
-set -a
-. ./.env
-set +a
 npm start
 ```
 
