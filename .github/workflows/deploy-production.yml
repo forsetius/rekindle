@@ -1,0 +1,175 @@
+name: Deploy production
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: rekindle-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: ${{ vars.APP_URL }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Assert required production secrets and variables
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.MYDEVIL_SSH_PRIVATE_KEY }}
+          RUNTIME_ENV: ${{ secrets.RUNTIME_ENV }}
+          KNOWN_HOSTS: ${{ vars.MYDEVIL_KNOWN_HOSTS }}
+        run: |
+          [ -n "${SSH_PRIVATE_KEY:-}" ] || { echo "Missing secret: MYDEVIL_SSH_PRIVATE_KEY"; exit 1; }
+          [ -n "${RUNTIME_ENV:-}" ] || { echo "Missing secret: RUNTIME_ENV"; exit 1; }
+          [ -n "${KNOWN_HOSTS:-}" ] || { echo "Missing variable: MYDEVIL_KNOWN_HOSTS"; exit 1; }
+          [ -n "${{ vars.MYDEVIL_HOST }}" ] || { echo "Missing variable: MYDEVIL_HOST"; exit 1; }
+          [ -n "${{ vars.MYDEVIL_USER }}" ] || { echo "Missing variable: MYDEVIL_USER"; exit 1; }
+          [ -n "${{ vars.MYDEVIL_DOMAIN }}" ] || { echo "Missing variable: MYDEVIL_DOMAIN"; exit 1; }
+          [ -n "${{ vars.APP_URL }}" ] || { echo "Missing variable: APP_URL"; exit 1; }
+          [ "${{ vars.MYDEVIL_DOMAIN }}" = "rekindle.forseti.pl" ] || { echo "MYDEVIL_DOMAIN must be rekindle.forseti.pl"; exit 1; }
+          [ "${{ vars.APP_URL }}" = "https://rekindle.forseti.pl" ] || { echo "APP_URL must be https://rekindle.forseti.pl"; exit 1; }
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Validate
+        run: |
+          npm run lint
+          npm run typecheck
+          npm test
+
+      - name: Prepare artifact
+        id: release
+        run: |
+          release_id="$(date -u +'%Y-%m-%d_%H-%M-%S')-${GITHUB_SHA::7}"
+          echo "release_id=$release_id" >> "$GITHUB_OUTPUT"
+          tar -czf "rekindle-$release_id.tar.gz" dist package.json package-lock.json public
+
+      - name: Configure SSH
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.MYDEVIL_SSH_PRIVATE_KEY }}
+          KNOWN_HOSTS: ${{ vars.MYDEVIL_KNOWN_HOSTS }}
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
+          printf '%s\n' "$KNOWN_HOSTS" > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/id_ed25519
+
+      - name: Upload artifact and env
+        env:
+          RUNTIME_ENV: ${{ secrets.RUNTIME_ENV }}
+          RELEASE_ID: ${{ steps.release.outputs.release_id }}
+        run: |
+          remote="${{ vars.MYDEVIL_USER }}@${{ vars.MYDEVIL_HOST }}"
+          ssh "$remote" "mkdir -p ~/apps/rekindle/production/incoming"
+          scp "rekindle-$RELEASE_ID.tar.gz" "$remote:~/apps/rekindle/production/incoming/"
+          printf '%s\n' "$RUNTIME_ENV" > runtime.env
+          scp runtime.env "$remote:~/apps/rekindle/production/incoming/runtime.env"
+
+      - name: Install release and restart production
+        env:
+          RELEASE_ID: ${{ steps.release.outputs.release_id }}
+        run: |
+          remote="${{ vars.MYDEVIL_USER }}@${{ vars.MYDEVIL_HOST }}"
+          ssh "$remote" "RELEASE_ID='$RELEASE_ID' DOMAIN='${{ vars.MYDEVIL_DOMAIN }}' bash -s" <<'REMOTE'
+          set -euo pipefail
+
+          app_base="$HOME/apps/rekindle/production"
+          releases_base="$HOME/apps/rekindle/releases"
+          incoming_base="$app_base/incoming"
+          release_dir="$releases_base/$RELEASE_ID"
+          domain_app_js="$HOME/domains/$DOMAIN/public_nodejs/app.js"
+
+          mkdir -p "$app_base/shared" "$incoming_base" "$releases_base" "$(dirname "$domain_app_js")"
+
+          if [ -e "$release_dir" ]; then
+            echo "Release already exists: $release_dir"
+            exit 1
+          fi
+
+          mkdir -p "$release_dir"
+          tar -xzf "$incoming_base/rekindle-$RELEASE_ID.tar.gz" -C "$release_dir"
+          find "$incoming_base" -maxdepth 1 -type f -name '*.tar.gz' -delete
+
+          cd "$release_dir"
+          npm24 ci --omit=dev
+
+          mv "$incoming_base/runtime.env" "$app_base/shared/runtime.env"
+          chmod 600 "$app_base/shared/runtime.env"
+
+          cat > "$domain_app_js" <<'APPJS'
+          const fs = require('node:fs');
+          const path = require('node:path');
+          const { pathToFileURL } = require('node:url');
+
+          const applicationBase = path.join(process.env.HOME, 'apps/rekindle/production');
+          const releasesBase = path.join(process.env.HOME, 'apps/rekindle/releases');
+          const runtimeEnvironmentPath = path.join(applicationBase, 'shared/runtime.env');
+          const currentReleasePath = path.join(applicationBase, 'current-release');
+
+          function loadRuntimeEnvironment(filePath) {
+            const content = fs.readFileSync(filePath, 'utf8');
+
+            for (const rawLine of content.split(/\r?\n/)) {
+              const line = rawLine.trim();
+
+              if (line.length === 0 || line.startsWith('#')) {
+                continue;
+              }
+
+              const separatorIndex = line.indexOf('=');
+
+              if (separatorIndex === -1) {
+                continue;
+              }
+
+              const key = line.slice(0, separatorIndex).trim();
+              const value = line.slice(separatorIndex + 1).trim().replace(/^"(.*)"$/, '$1');
+
+              process.env[key] = value;
+            }
+          }
+
+          loadRuntimeEnvironment(runtimeEnvironmentPath);
+
+          const releaseName = fs.readFileSync(currentReleasePath, 'utf8').trim();
+          const releaseDirectory = path.join(releasesBase, releaseName);
+
+          process.chdir(releaseDirectory);
+          import(pathToFileURL(path.join(releaseDirectory, 'dist/src/server.js')).href).catch((error) => {
+            console.error('Unable to start ReKindle:', error);
+            process.exit(1);
+          });
+          APPJS
+
+          printf '%s\n' "$RELEASE_ID" > "$app_base/current-release.tmp"
+          mv "$app_base/current-release.tmp" "$app_base/current-release"
+
+          devil www restart "$DOMAIN"
+          REMOTE
+
+      - name: Smoke test
+        run: curl --retry 10 --retry-delay 2 --retry-all-errors --fail --show-error --silent "${{ vars.APP_URL }}/health"
+
+      - name: Publish release summary
+        env:
+          RELEASE_ID: ${{ steps.release.outputs.release_id }}
+        run: |
+          {
+            echo "### Production release"
+            echo
+            echo "- release_id: \`$RELEASE_ID\`"
+            echo "- url: ${{ vars.APP_URL }}"
+          } >> "$GITHUB_STEP_SUMMARY"
