@@ -49,13 +49,23 @@
     );
   }
 
+  function viewportDimensions() {
+    var root = document.documentElement;
+    var screen = window.screen || {};
+    return {
+      height: window.innerHeight || root.clientHeight || screen.height || 0,
+      width: window.innerWidth || root.clientWidth || screen.width || 0
+    };
+  }
+
   function rotateViewport() {
+    var dimensions = viewportDimensions();
     body.style.overflow = "hidden";
     viewport.style.position = "absolute";
     viewport.style.top = "0";
-    viewport.style.left = window.innerWidth + "px";
-    viewport.style.width = window.innerHeight + "px";
-    viewport.style.height = window.innerWidth + "px";
+    viewport.style.left = dimensions.width + "px";
+    viewport.style.width = dimensions.height + "px";
+    viewport.style.height = dimensions.width + "px";
     viewport.style.webkitTransformOrigin = "0 0";
     viewport.style.transformOrigin = "0 0";
     viewport.style.webkitTransform = "rotate(90deg)";
@@ -82,6 +92,7 @@
 
     var root = document.documentElement;
     var screen = window.screen || {};
+    var dimensions = viewportDimensions();
     var panel = document.createElement("pre");
     panel.style.position = "absolute";
     panel.style.top = "0";
@@ -96,6 +107,7 @@
       "inner: " + window.innerWidth + " x " + window.innerHeight + "\n" +
       "root: " + root.clientWidth + " x " + root.clientHeight + "\n" +
       "screen: " + screen.width + " x " + screen.height + "\n" +
+      "layout: " + dimensions.width + " x " + dimensions.height + "\n" +
       "preference: " + landscapePreference + "\n" +
       "rotate: " + shouldRotate + "\n" +
       "webkitTransform: " + ("webkitTransform" in viewport.style) + "\n" +

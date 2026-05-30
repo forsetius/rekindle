@@ -232,7 +232,7 @@ function renderNavigation(destination: string, content: string): string {
 function renderDocument(options: { title: string; refresh: string; bodyClass: string; body: string }): string {
   return `<!doctype html>
 <html lang="pl"><head><meta charset="utf-8"><meta http-equiv="refresh" content="${options.refresh}"><meta name="viewport" content="width=device-width, initial-scale=1"><title>${escapeHtml(options.title)}</title><link rel="stylesheet" href="/assets/styles.css?v=3"></head>
-<body class="${options.bodyClass}"><div id="rekindle-viewport">${options.body}</div><script src="/assets/compatibility.js?v=3"></script></body></html>`;
+<body class="${options.bodyClass}"><div id="rekindle-viewport">${options.body}</div><script src="/assets/compatibility.js?v=4"></script></body></html>`;
 }
 
 function iconPathForWeather(weatherCode: number, timestamp: string): string {

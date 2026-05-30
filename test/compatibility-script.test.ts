@@ -45,6 +45,22 @@ test("forces and remembers landscape layout when requested in the URL", () => {
   assert.match(document.cookie, /rekindleLandscape=1/);
 });
 
+test("uses document dimensions when the Kindle browser reports zero window dimensions", () => {
+  const { viewportStyle } = runCompatibilityScript({
+    innerHeight: 0,
+    innerWidth: 0,
+    rootHeight: 897,
+    rootWidth: 758,
+    screenHeight: 1024,
+    screenWidth: 758,
+    search: "?landscape=1"
+  });
+
+  assert.equal(viewportStyle.left, "758px");
+  assert.equal(viewportStyle.width, "897px");
+  assert.equal(viewportStyle.height, "758px");
+});
+
 test("binds touch navigation without visible HTML links", () => {
   const navigationElement = {
     getAttribute(name: string): string | null {
@@ -67,6 +83,10 @@ function runCompatibilityScript(options: {
   innerHeight: number;
   innerWidth: number;
   navigationElements?: Array<{ getAttribute(name: string): string | null; onclick: () => void }>;
+  rootHeight?: number;
+  rootWidth?: number;
+  screenHeight?: number;
+  screenWidth?: number;
   search?: string;
 }): {
   document: { cookie: string };
@@ -78,8 +98,8 @@ function runCompatibilityScript(options: {
     body: { style: {} },
     cookie: "",
     documentElement: {
-      clientHeight: options.innerHeight,
-      clientWidth: options.innerWidth,
+      clientHeight: options.rootHeight ?? options.innerHeight,
+      clientWidth: options.rootWidth ?? options.innerWidth,
       style: {}
     },
     getElementById: () => ({ style: viewportStyle }),
@@ -89,7 +109,10 @@ function runCompatibilityScript(options: {
     innerHeight: options.innerHeight,
     innerWidth: options.innerWidth,
     location: { href: "", search: options.search ?? "" },
-    screen: { height: options.innerHeight, width: options.innerWidth }
+    screen: {
+      height: options.screenHeight ?? options.innerHeight,
+      width: options.screenWidth ?? options.innerWidth
+    }
   };
 
   runInNewContext(compatibilityScript, {
