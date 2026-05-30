@@ -13,6 +13,7 @@ test("renders a dashboard with clock script, refresh, links and PNG icons", () =
   const html = renderDashboard(createSnapshot(), new Date("2026-05-30T09:42:00Z"));
 
   assert.match(html, /http-equiv="refresh" content="1800"/);
+  assert.match(html, /src="\/assets\/compatibility\.js"/);
   assert.match(html, /src="\/assets\/dashboard\.js"/);
   assert.match(html, /href="\/calendar"/);
   assert.match(html, /href="\/weather"/);

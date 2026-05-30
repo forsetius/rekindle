@@ -227,8 +227,8 @@ function renderMissingData(): string {
 
 function renderDocument(options: { title: string; refresh: string; bodyClass: string; body: string }): string {
   return `<!doctype html>
-<html lang="pl"><head><meta charset="utf-8"><meta http-equiv="refresh" content="${options.refresh}"><meta name="viewport" content="width=device-width, initial-scale=1"><title>${escapeHtml(options.title)}</title><link rel="stylesheet" href="/assets/styles.css"></head>
-<body class="${options.bodyClass}">${options.body}</body></html>`;
+<html lang="pl"><head><meta charset="utf-8"><meta http-equiv="refresh" content="${options.refresh}"><meta name="viewport" content="width=device-width, initial-scale=1"><title>${escapeHtml(options.title)}</title><link rel="stylesheet" href="/assets/styles.css?v=2"></head>
+<body class="${options.bodyClass}"><script src="/assets/compatibility.js"></script>${options.body}</body></html>`;
 }
 
 function iconPathForWeather(weatherCode: number, timestamp: string): string {

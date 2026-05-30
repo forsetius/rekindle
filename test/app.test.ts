@@ -46,6 +46,15 @@ test("serves HTML pages, health JSON and static assets", async (testingContext) 
   const css = await cssResponse.text();
   assert.doesNotMatch(css, /display:\s*(flex|grid)/);
   assert.doesNotMatch(css, /var\(--/);
+  assert.match(css, /a:link, a:visited, a:hover, a:active \{[^}]*text-decoration: none !important;/);
+
+  const compatibilityScriptResponse = await fetch(`${baseUrl}/assets/compatibility.js`);
+  assert.equal(compatibilityScriptResponse.status, 200);
+  assert.match(compatibilityScriptResponse.headers.get("content-type") ?? "", /text\/javascript/);
+  const compatibilityScript = await compatibilityScriptResponse.text();
+  assert.match(compatibilityScript, /window\.innerHeight/);
+  assert.match(compatibilityScript, /window\.innerWidth/);
+  assert.match(compatibilityScript, /webkitTransform/);
 
   const iconResponse = await fetch(`${baseUrl}/assets/icons/storm.png`);
   assert.equal(iconResponse.status, 200);

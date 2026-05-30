@@ -5,9 +5,10 @@ the unmodified device before considering firmware-specific changes.
 
 ## Baseline Setup
 
-1. Set the Kindle to landscape orientation.
-2. Connect it to Wi-Fi and power for a long-running test.
-3. Open the ReKindle dashboard URL in Experimental Browser.
+1. Connect the Kindle to Wi-Fi and power for a long-running test.
+2. Open the ReKindle dashboard URL in Experimental Browser.
+3. If Experimental Browser remains in portrait mode, confirm that ReKindle rotates
+   its content into an emulated landscape layout.
 4. Confirm that the dashboard renders and that touch targets open detail pages.
 
 ## Physical Validation Checklist
