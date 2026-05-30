@@ -4,7 +4,7 @@ set -eu
 mkdir -p public/assets/icons
 
 render_icon() {
-  convert -background white -density 192 "$1" -resize 128x128 -gravity center -extent 128x128 -depth 8 -type Grayscale -strip "$2"
+  convert -background none -density 192 "$1" -resize 128x128 -gravity center -extent 128x128 -colorspace Gray -depth 8 -strip "$2"
 }
 
 render_icon assets/icon-sources/sun.svg public/assets/icons/sun.png
