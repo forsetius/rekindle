@@ -11,6 +11,11 @@ the unmodified device before considering firmware-specific changes.
    its content into an emulated landscape layout.
 4. Confirm that the dashboard renders and that touch targets open detail pages.
 
+If automatic rotation does not work, open `/?landscape=1` once. This stores the
+forced landscape preference in a cookie and applies it to detail pages as well.
+Open `/?landscape=0` to clear the forced rotation. To inspect the viewport values
+reported by an older browser, open `/?landscape=1&diagnostics=1`.
+
 ## Physical Validation Checklist
 
 ### UI checkpoint

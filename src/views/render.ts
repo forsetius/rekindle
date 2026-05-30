@@ -56,20 +56,20 @@ export function renderDashboard(snapshot: DashboardSnapshot, serverNow: Date = n
     bodyClass: "dashboard-body",
     body: `<div class="dashboard-screen">
       <div class="screen-header">
-        <a href="/calendar">${escapeHtml(formatHeaderDate(localDate))}</a>
+        ${renderNavigation("/calendar", escapeHtml(formatHeaderDate(localDate)))}
         <span>${escapeHtml(snapshot.locationName)}</span>
       </div>
       <table class="dashboard-main"><tr>
-        <td class="clock-cell"><a href="/calendar"><span id="dashboard-clock" data-server-epoch="${serverNow.getTime()}" data-hours="${clock.slice(0, 2)}" data-minutes="${clock.slice(3, 5)}">${clock}</span></a></td>
-        <td class="current-weather-cell"><a href="/weather">${weatherHtml}</a></td>
+        <td class="clock-cell">${renderNavigation("/calendar", `<span id="dashboard-clock" data-server-epoch="${serverNow.getTime()}" data-hours="${clock.slice(0, 2)}" data-minutes="${clock.slice(3, 5)}">${clock}</span>`)}</td>
+        <td class="current-weather-cell">${renderNavigation("/weather", weatherHtml)}</td>
       </tr></table>
       <table class="dashboard-secondary"><tr>
-        <td class="alerts-cell"><a href="/alerts"><span class="section-label">Alerty</span>${renderDashboardAlertIcons(snapshot.dashboardAlertCategories)}</a></td>
-        <td class="forecast-cell"><a href="/weather"><span class="section-label">Później</span>${renderDashboardForecasts(snapshot.dashboardForecasts)}</a></td>
+        <td class="alerts-cell">${renderNavigation("/alerts", `<span class="section-label">Alerty</span>${renderDashboardAlertIcons(snapshot.dashboardAlertCategories)}`)}</td>
+        <td class="forecast-cell">${renderNavigation("/weather", `<span class="section-label">Później</span>${renderDashboardForecasts(snapshot.dashboardForecasts)}`)}</td>
       </tr></table>
       <div class="screen-footer"><span>${escapeHtml(snapshot.footerMessage)}</span><span>${formatUpdatedAt(snapshot.updatedAt.weather, snapshot.timeZone)}</span></div>
     </div>
-    <script src="/assets/dashboard.js"></script>`
+    <script src="/assets/dashboard.js?v=2"></script>`
   });
 }
 
@@ -121,7 +121,7 @@ function renderDetailPage(
     refresh: "300; url=/",
     bodyClass: "detail-body",
     body: `<div class="detail-screen">
-      <div class="screen-header"><a href="/">← Pulpit</a><span>${escapeHtml(headerDetail)}</span></div>
+      <div class="screen-header">${renderNavigation("/", "← Pulpit")}<span>${escapeHtml(headerDetail)}</span></div>
       <div class="detail-content"><h1>${escapeHtml(title)}</h1>${content}</div>
       <div class="screen-footer"><span>${escapeHtml(footerDetail)}</span><span>Powrót automatyczny za 5 minut</span></div>
     </div>`
@@ -225,10 +225,14 @@ function renderMissingData(): string {
   return '<p class="missing-data">Brak danych. Serwer spróbuje ponownie przy następnej aktualizacji.</p>';
 }
 
+function renderNavigation(destination: string, content: string): string {
+  return `<span class="navigation-link" data-href="${destination}" role="link">${content}</span>`;
+}
+
 function renderDocument(options: { title: string; refresh: string; bodyClass: string; body: string }): string {
   return `<!doctype html>
-<html lang="pl"><head><meta charset="utf-8"><meta http-equiv="refresh" content="${options.refresh}"><meta name="viewport" content="width=device-width, initial-scale=1"><title>${escapeHtml(options.title)}</title><link rel="stylesheet" href="/assets/styles.css?v=2"></head>
-<body class="${options.bodyClass}"><script src="/assets/compatibility.js"></script>${options.body}</body></html>`;
+<html lang="pl"><head><meta charset="utf-8"><meta http-equiv="refresh" content="${options.refresh}"><meta name="viewport" content="width=device-width, initial-scale=1"><title>${escapeHtml(options.title)}</title><link rel="stylesheet" href="/assets/styles.css?v=3"></head>
+<body class="${options.bodyClass}"><div id="rekindle-viewport">${options.body}</div><script src="/assets/compatibility.js?v=3"></script></body></html>`;
 }
 
 function iconPathForWeather(weatherCode: number, timestamp: string): string {

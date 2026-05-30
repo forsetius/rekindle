@@ -7,7 +7,7 @@ a:link, a:visited, a:hover, a:active { color: inherit !important; text-decoratio
 .dashboard-screen { position: relative; padding-bottom: 42px; }
 .screen-header, .screen-footer { height: 42px; font: bold 15px/42px Arial, sans-serif; letter-spacing: 1.6px; text-transform: uppercase; }
 .screen-header { border-bottom: 3px solid #242424; }
-.screen-header span { float: right; }
+.screen-header > span:last-child { float: right; }
 .screen-footer { border-top: 2px solid #666; color: #4a4a4a; font-size: 13px; letter-spacing: .3px; text-transform: none; }
 .screen-footer span:last-child { float: right; }
 .dashboard-screen .screen-footer { position: absolute; right: 38px; bottom: 0; left: 38px; }
@@ -15,7 +15,8 @@ a:link, a:visited, a:hover, a:active { color: inherit !important; text-decoratio
 .dashboard-main { height: 360px; }
 .dashboard-main td { vertical-align: middle; }
 .clock-cell { width: 58%; }
-.clock-cell a, .current-weather-cell a, .alerts-cell a, .forecast-cell a { display: block; }
+.navigation-link { cursor: pointer; }
+.clock-cell .navigation-link, .current-weather-cell .navigation-link, .alerts-cell .navigation-link, .forecast-cell .navigation-link { display: block; }
 #dashboard-clock { font: bold 160px/.86 Arial, sans-serif; letter-spacing: -13px; }
 .current-weather-cell { width: 42%; border-left: 3px solid #242424; padding-left: 33px; }
 .current-weather-icon, .current-temperature, .current-condition { display: inline-block; vertical-align: middle; }
