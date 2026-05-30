@@ -61,6 +61,30 @@ docker build -t rekindle .
 docker run --rm --env-file .env -p 3000:3000 rekindle
 ```
 
+## Deploy To MyDevil
+
+The manual `Deploy production` GitHub Actions workflow deploys directly to
+`https://rekindle.forseti.pl`. It validates the application, uploads an immutable
+release through SSH, installs runtime dependencies with `npm24`, restarts the
+MyDevil Node.js domain, and checks `/health`.
+
+Create a GitHub `production` environment with:
+
+| Type | Name | Value |
+| --- | --- | --- |
+| Secret | `MYDEVIL_SSH_PRIVATE_KEY` | SSH private key used for deployment. |
+| Secret | `RUNTIME_ENV` | Production variables in `.env` format. |
+| Variable | `MYDEVIL_HOST` | MyDevil SSH host. |
+| Variable | `MYDEVIL_USER` | MyDevil SSH user. |
+| Variable | `MYDEVIL_KNOWN_HOSTS` | Pinned SSH host key entry. |
+| Variable | `MYDEVIL_DOMAIN` | `rekindle.forseti.pl` |
+| Variable | `APP_URL` | `https://rekindle.forseti.pl` |
+
+Before the first deployment, configure `rekindle.forseti.pl` in MyDevil as a
+Node.js domain using Node.js 24 and enable HTTPS. The workflow creates releases
+under `~/apps/rekindle/` and writes the Passenger entry point to
+`~/domains/rekindle.forseti.pl/public_nodejs/app.js`.
+
 ## Development
 
 ```sh
