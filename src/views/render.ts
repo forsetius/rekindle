@@ -232,21 +232,25 @@ function renderNavigation(destination: string, content: string): string {
 function renderDocument(options: { title: string; refresh: string; bodyClass: string; body: string }): string {
   return `<!doctype html>
 <html lang="pl"><head><meta charset="utf-8"><meta http-equiv="refresh" content="${options.refresh}"><meta name="viewport" content="width=device-width, initial-scale=1"><title>${escapeHtml(options.title)}</title><link rel="stylesheet" href="/assets/styles.css?v=3"></head>
-<body class="${options.bodyClass}"><div id="rekindle-viewport">${options.body}</div><script src="/assets/compatibility.js?v=4"></script></body></html>`;
+<body class="${options.bodyClass}"><noscript><style>#rekindle-viewport { visibility: visible !important; }</style></noscript><div id="rekindle-viewport" style="visibility: hidden">${options.body}</div><script src="/assets/compatibility.js?v=5"></script></body></html>`;
 }
 
 function iconPathForWeather(weatherCode: number, timestamp: string): string {
   const hour = Number(timestamp.slice(11, 13));
-  if (weatherCode >= 95) return "/assets/icons/storm.png";
-  if (weatherCode >= 51) return "/assets/icons/rain.png";
-  if (weatherCode >= 3) return "/assets/icons/cloud.png";
-  if (hour >= 20 || hour < 6) return "/assets/icons/moon.png";
-  if (weatherCode >= 1) return "/assets/icons/partly-cloudy.png";
-  return "/assets/icons/sun.png";
+  if (weatherCode >= 95) return iconPath("storm");
+  if (weatherCode >= 51) return iconPath("rain");
+  if (weatherCode >= 3) return iconPath("cloud");
+  if (hour >= 20 || hour < 6) return iconPath("moon");
+  if (weatherCode >= 1) return iconPath("partly-cloudy");
+  return iconPath("sun");
 }
 
 function iconPathForAlert(category: AlertCategory): string {
-  return `/assets/icons/alert-${category}.png`;
+  return iconPath(`alert-${category}`);
+}
+
+function iconPath(iconName: string): string {
+  return `/assets/icons/${iconName}.png?v=2`;
 }
 
 function weatherDescription(weatherCode: number): string {

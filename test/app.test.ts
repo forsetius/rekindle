@@ -59,6 +59,8 @@ test("serves HTML pages, health JSON and static assets", async (testingContext) 
   const iconResponse = await fetch(`${baseUrl}/assets/icons/storm.png`);
   assert.equal(iconResponse.status, 200);
   assert.equal(iconResponse.headers.get("content-type"), "image/png");
+  const icon = new Uint8Array(await iconResponse.arrayBuffer());
+  assert.equal(icon[25], 4);
 });
 
 test("returns 404 for an unknown route", async (testingContext) => {

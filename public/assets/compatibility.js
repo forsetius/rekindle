@@ -72,6 +72,24 @@
     viewport.style.transform = "rotate(90deg)";
   }
 
+  function readLayoutHeight() {
+    return viewport.offsetHeight;
+  }
+
+  function refreshViewport(shouldReveal) {
+    if (shouldRotate) {
+      rotateViewport();
+    }
+
+    viewport.style.display = "none";
+    readLayoutHeight();
+    viewport.style.display = "block";
+    readLayoutHeight();
+    if (shouldReveal) {
+      viewport.style.visibility = "visible";
+    }
+  }
+
   function bindNavigation() {
     var elements = document.getElementsByTagName("*");
     var index;
@@ -126,10 +144,11 @@
     landscapePreference === "1" ||
     (landscapePreference !== "0" && isPortraitViewport());
 
-  if (shouldRotate) {
-    rotateViewport();
-  }
-
   bindNavigation();
+  refreshViewport(false);
+  window.setTimeout(function () { refreshViewport(false); }, 0);
+  window.setTimeout(function () { refreshViewport(true); }, 250);
+  window.setTimeout(function () { refreshViewport(true); }, 1000);
+  window.onload = function () { refreshViewport(true); };
   showDiagnostics(shouldRotate, landscapePreference);
 }());
