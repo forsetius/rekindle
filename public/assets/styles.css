@@ -1,0 +1,74 @@
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body { margin: 0; background: #f7f5ef; color: #151515; font-family: Georgia, serif; }
+a { color: inherit; text-decoration: none; }
+.dashboard-screen, .detail-screen { height: 100%; min-height: 100%; padding: 0 38px; }
+.dashboard-screen { position: relative; padding-bottom: 42px; }
+.screen-header, .screen-footer { height: 42px; font: bold 15px/42px Arial, sans-serif; letter-spacing: 1.6px; text-transform: uppercase; }
+.screen-header { border-bottom: 3px solid #242424; }
+.screen-header span { float: right; }
+.screen-footer { border-top: 2px solid #666; color: #4a4a4a; font-size: 13px; letter-spacing: .3px; text-transform: none; }
+.screen-footer span:last-child { float: right; }
+.dashboard-screen .screen-footer { position: absolute; right: 38px; bottom: 0; left: 38px; }
+.dashboard-main, .dashboard-secondary, .detail-columns, .metrics { width: 100%; border-collapse: collapse; table-layout: fixed; }
+.dashboard-main { height: 360px; }
+.dashboard-main td { vertical-align: middle; }
+.clock-cell { width: 58%; }
+.clock-cell a, .current-weather-cell a, .alerts-cell a, .forecast-cell a { display: block; }
+#dashboard-clock { font: bold 160px/.86 Arial, sans-serif; letter-spacing: -13px; }
+.current-weather-cell { width: 42%; border-left: 3px solid #242424; padding-left: 33px; }
+.current-weather-icon, .current-temperature, .current-condition { display: inline-block; vertical-align: middle; }
+.current-weather-icon { width: 88px; height: 88px; margin-right: 18px; }
+.current-temperature { font: bold 85px/.86 Arial, sans-serif; letter-spacing: -6px; }
+.current-condition { display: block; margin-top: 10px; font: bold 17px/1.1 Arial, sans-serif; letter-spacing: 1px; text-transform: uppercase; }
+.dashboard-secondary { height: 124px; border-top: 2px solid #666; }
+.dashboard-secondary td { padding-top: 16px; padding-bottom: 16px; vertical-align: middle; }
+.alerts-cell { width: 39%; padding-right: 31px; }
+.forecast-cell { width: 61%; border-left: 2px solid #666; padding-left: 31px; }
+.section-label { display: block; margin-bottom: 12px; color: #373737; font: bold 13px/1 Arial, sans-serif; letter-spacing: 1.5px; text-transform: uppercase; }
+.dashboard-alert-icons { display: block; text-align: right; }
+.dashboard-alert-icons img { width: 55px; height: 55px; margin-left: 14px; }
+.dashboard-forecast { display: inline-block; margin-right: 31px; vertical-align: middle; }
+.dashboard-forecast img, .dashboard-forecast span { display: inline-block; vertical-align: middle; }
+.dashboard-forecast img { width: 54px; height: 54px; margin-right: 10px; }
+.dashboard-forecast small, .dashboard-forecast strong { display: block; font-family: Arial, sans-serif; }
+.dashboard-forecast small { margin-bottom: 4px; color: #444; font-size: 11px; letter-spacing: .8px; text-transform: uppercase; }
+.dashboard-forecast strong { font-size: 41px; line-height: .9; letter-spacing: -2px; }
+.detail-screen { position: relative; padding-bottom: 42px; }
+.detail-content { padding-top: 18px; }
+.detail-content h1 { margin: 0 0 22px; font: bold 38px/1 Arial, sans-serif; letter-spacing: -1px; }
+.detail-screen .screen-footer { position: absolute; right: 38px; bottom: 0; left: 38px; }
+.detail-columns td { width: 50%; padding-right: 26px; vertical-align: top; }
+.detail-columns td + td { border-left: 2px solid #777; padding-right: 0; padding-left: 26px; }
+.weather-now img, .weather-now span { display: inline-block; vertical-align: middle; }
+.detail-large-icon { width: 90px; height: 90px; margin-right: 18px; }
+.detail-temperature { font: bold 96px/.85 Arial, sans-serif; letter-spacing: -7px; }
+.detail-condition { margin: 12px 0 22px; font: bold 20px/1 Arial, sans-serif; letter-spacing: 1px; text-transform: uppercase; }
+.metrics td { padding: 8px; border-top: 1px solid #999; }
+.metrics td + td { border-left: 1px solid #999; padding-left: 12px; }
+.metrics strong, .metrics small { display: block; font-family: Arial, sans-serif; }
+.metrics strong { font-size: 28px; }
+.metrics small { color: #555; font-size: 13px; }
+.hourly { white-space: nowrap; }
+.hourly-item { display: inline-block; width: 16%; margin-right: 4%; text-align: center; }
+.hourly-item small, .hourly-item strong, .hourly-item img { display: block; margin-right: auto; margin-left: auto; font-family: Arial, sans-serif; }
+.hourly-item img { width: 44px; height: 44px; margin-top: 10px; margin-bottom: 8px; }
+.hourly-item strong { font-size: 30px; }
+.tomorrow { margin-top: 28px; padding-top: 17px; border-top: 1px solid #777; }
+.tomorrow strong { margin-right: 20px; font: bold 31px/1 Arial, sans-serif; }
+.aqi-number { margin: 0; font: bold 132px/.82 Arial, sans-serif; letter-spacing: -9px; }
+.aqi-status { margin-top: 20px; font: bold 23px/1 Arial, sans-serif; letter-spacing: 1px; text-transform: uppercase; }
+.pollutant { margin: 0; padding: 12px 0; border-bottom: 1px solid #aaa; font: 18px/1 Arial, sans-serif; }
+.pollutant strong { float: right; }
+.alert-detail { min-height: 108px; padding: 18px 0; border-top: 1px solid #777; }
+.alert-detail:first-child { border-top: 0; }
+.alert-detail-icon { float: left; width: 80px; height: 80px; margin: 0 28px 12px 0; }
+.alert-detail-copy h2 { margin: 0; font: bold 23px/1 Arial, sans-serif; text-transform: uppercase; }
+.alert-detail-copy p { margin: 10px 0 0; font-size: 18px; line-height: 1.4; }
+.alert-source { font: bold 13px/1 Arial, sans-serif; letter-spacing: 1px; text-transform: uppercase; }
+.calendar { font: bold 22px/1 Arial, sans-serif; text-align: center; }
+.calendar span { display: inline-block; width: 14.285%; padding: 16px 2px; vertical-align: middle; }
+.calendar-weekday { border-bottom: 1px solid #777; color: #555; font-size: 14px; text-transform: uppercase; }
+.calendar-muted { color: #aaa; }
+.calendar-today { outline: 3px solid #222; outline-offset: -6px; }
+.missing-data { color: #555; font: bold 22px/1.4 Arial, sans-serif; }
